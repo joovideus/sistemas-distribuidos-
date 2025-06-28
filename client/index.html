@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <title>Chat em tempo real</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f4f4f4;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+
+    #chat-container {
+      background: white;
+      border-radius: 8px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      width: 400px;
+      padding: 20px;
+    }
+
+    h1 {
+      font-size: 22px;
+      text-align: center;
+      margin-bottom: 10px;
+    }
+
+    ul {
+      list-style: none;
+      padding: 0;
+      height: 300px;
+      overflow-y: auto;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      margin-bottom: 10px;
+    }
+
+    li {
+      padding: 5px 10px;
+      border-bottom: 1px solid #eee;
+    }
+
+    #entrada, #botao {
+      padding: 10px;
+      font-size: 14px;
+    }
+
+    #entrada {
+      width: 70%;
+    }
+
+    #botao {
+      width: 28%;
+      background: #2196f3;
+      color: white;
+      border: none;
+      cursor: pointer;
+      border-radius: 4px;
+    }
+
+    #botao:hover {
+      background: #1976d2;
+    }
+  </style>
+</head>
+<body>
+  <div id="chat-container">
+    <h1>Chat em Tempo Real</h1>
+    <ul id="mensagens"></ul>
+    <input id="entrada" placeholder="Digite sua mensagem" />
+    <button id="botao" onclick="enviar()">Enviar</button>
+  </div>
+
+  <script src="https://cdn.socket.io/4.0.0/socket.io.min.js"></script>
+  <script>
+    const socket = io("http://localhost:3035");
+    let nome = "";
+
+    
+    while (!nome) {
+      nome = prompt("Digite seu nome:");
+    }
+
+    socket.on("connect", () => {
+      console.log("Conectado como", nome);
+    });
+
+    socket.on("message", (mensagem) => {
+      const item = document.createElement("li");
+      item.textContent = mensagem;
+      document.getElementById("mensagens").appendChild(item);
+    });
+
+    function enviar() {
+      const input = document.getElementById("entrada");
+      const msg = input.value.trim();
+      if (msg !== "") {
+        socket.send(`${nome}: ${msg}`);
+        input.value = "";
+      }
+    }
+  </script>
+</body>
+</html>
